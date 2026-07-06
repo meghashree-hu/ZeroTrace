@@ -4,7 +4,12 @@ import { authenticate } from "../../../middleware/auth.middleware";
 
 import uploadMiddleware from "../../../middleware/upload.middleware";
 
-import { upload } from "../controllers/document.controller";
+import {
+  upload,
+  getDocuments,
+  getDocumentById,
+  deleteDocument,
+} from "../controllers/document.controller";
 
 import {
 
@@ -27,5 +32,21 @@ router.post(
     upload
 
 );
+router.get(
+  "/",
+  authenticate,
+  getDocuments
+);
 
+router.get(
+  "/:documentId",
+  authenticate,
+  getDocumentById
+);
+
+router.delete(
+  "/:documentId",
+  authenticate,
+  deleteDocument
+);
 export default router;

@@ -60,3 +60,30 @@ export const uploadDocument = async (
   return document;
 
 };
+export const getDocuments = async (ownerId: string) => {
+  return await Document.find({
+    ownerId,
+  }).sort({
+    createdAt: -1,
+  });
+};
+
+export const getDocumentById = async (
+  ownerId: string,
+  documentId: string
+) => {
+  return await Document.findOne({
+    ownerId,
+    documentId,
+  });
+};
+
+export const deleteDocument = async (
+  ownerId: string,
+  documentId: string
+) => {
+  return await Document.findOneAndDelete({
+    ownerId,
+    documentId,
+  });
+};

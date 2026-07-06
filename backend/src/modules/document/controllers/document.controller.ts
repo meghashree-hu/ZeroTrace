@@ -3,7 +3,13 @@ import { validationResult } from "express-validator";
 
 import { AuthRequest } from "../../../middleware/auth.middleware";
 
-import { uploadDocument } from "../services/document.service";
+import {
+  uploadDocument,
+  getDocuments as getDocumentsService,
+  getDocumentById as getDocumentByIdService,
+  deleteDocument as deleteDocumentService,
+} from "../services/document.service";
+
 
 export const upload = async (
 
@@ -104,4 +110,80 @@ export const upload = async (
 
     }
 
+};
+export const getDocuments = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const documents = await getDocumentsService(req.user!.id);
+
+    return res.status(200).json({
+      success: true,
+      data: documents,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getDocumentById = async (
+  req: AuthRequest<{ documentId: string }>,
+  res: Response
+) => {
+  try {
+    const document = await getDocumentByIdService(
+      req.user!.id,
+      req.params["documentId"]
+    );
+
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        message: "Document not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: document,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteDocument = async (
+  req: AuthRequest<{ documentId: string }>,
+  res: Response
+) => {
+  try {
+    const document = await deleteDocumentService(
+      req.user!.id,
+      req.params["documentId"]
+    );
+
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        message: "Document not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Document deleted successfully",
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
