@@ -3,6 +3,12 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
+
+import authRoutes from "./modules/auth/routes/auth.routes";
+import documentRoutes from "./modules/document/routes/document.routes";
+import shareRoutes from "./modules/share/routes/share.routes";
+import sessionRoutes from "./modules/session/routes/session.routes";
+
 const app = express();
 
 app.use(cors());
@@ -14,5 +20,11 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("🚀 ZeroTrace Backend Running");
 });
+
+app.use("/api/auth", authRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/share", shareRoutes);
+app.use("/api/session", sessionRoutes);
+
 
 export default app;
