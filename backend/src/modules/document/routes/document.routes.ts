@@ -7,6 +7,7 @@ import uploadMiddleware from "../../../middleware/upload.middleware";
 import {
   upload,
   getDocuments,
+  getDocumentStats,
   getDocumentById,
   deleteDocument,
 } from "../controllers/document.controller";
@@ -32,6 +33,12 @@ router.post(
     upload
 
 );
+router.get(
+  "/stats/summary",
+  authenticate,
+  getDocumentStats
+);
+
 router.get(
   "/",
   authenticate,

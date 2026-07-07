@@ -19,5 +19,7 @@ export const env = {
 
     AWS_REGION: process.env.AWS_REGION || "",
 
-    AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME || ""
+    AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME || "",
+
+    APP_URL: process.env.APP_URL || ""
 };

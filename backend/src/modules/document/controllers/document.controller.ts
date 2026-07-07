@@ -6,6 +6,7 @@ import { AuthRequest } from "../../../middleware/auth.middleware";
 import {
   uploadDocument,
   getDocuments as getDocumentsService,
+  getDocumentStats as getDocumentStatsService,
   getDocumentById as getDocumentByIdService,
   deleteDocument as deleteDocumentService,
 } from "../services/document.service";
@@ -45,47 +46,11 @@ export const upload = async (
 
     try {
 
-        const {
-
-    documentName,
-
-    accessMode,
-
-    expiryMinutes,
-
-    maxViews,
-
-    maxPrints,
-
-    downloadAllowed,
-
-    approvalRequired,
-
-    watermarkEnabled
-
-} = req.body; 
-
         const document = await uploadDocument(
 
     req.user!.id,
 
-    req.file,
-
-    documentName,
-
-    accessMode,
-
-    Number(expiryMinutes),
-
-    Number(maxViews),
-
-    Number(maxPrints),
-
-    downloadAllowed === "true",
-
-    approvalRequired === "true",
-
-    watermarkEnabled === "true"
+    req.file
 
 );
         return res.status(201).json({
@@ -121,6 +86,25 @@ export const getDocuments = async (
     return res.status(200).json({
       success: true,
       data: documents,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getDocumentStats = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const stats = await getDocumentStatsService(req.user!.id);
+
+    return res.status(200).json({
+      success: true,
+      data: stats,
     });
   } catch (error: any) {
     return res.status(500).json({

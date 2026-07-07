@@ -12,8 +12,9 @@ export const registerUser = async (
   email: string,
   password: string
 ) => {
+  const normalizedEmail = email.toLowerCase().trim();
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email: normalizedEmail });
 
   if (existingUser) {
     throw new Error("User already exists");
@@ -24,7 +25,7 @@ export const registerUser = async (
   const newUser = await User.create({
     userId: `USR-${uuidv4().slice(0,8).toUpperCase()}`,
     fullName,
-    email,
+    email: normalizedEmail,
     password: hashedPassword
   });
 
@@ -34,8 +35,9 @@ export const loginUser = async (
   email: string,
   password: string
 ) => {
+  const normalizedEmail = email.toLowerCase().trim();
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: normalizedEmail });
 
   if (!user) {
     throw new Error("Invalid email or password");

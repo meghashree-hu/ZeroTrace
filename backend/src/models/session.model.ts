@@ -6,7 +6,11 @@ export interface ISession extends Document {
 
     shareId: string;
 
+    documentId: string;
+
     ownerId: string;
+
+    requesterEmail?: string;
 
     status: "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED";
 
@@ -15,6 +19,12 @@ export interface ISession extends Document {
     approvedAt?: Date;
 
     expiresAt?: Date;
+    printCount?: number;
+    viewCount?: number;
+    deviceFingerprint?: string;
+    deviceInfo?: any;
+    ipAddress?: string;
+    lastAccessAt?: Date;
 
 }
 
@@ -40,6 +50,14 @@ const SessionSchema = new Schema<ISession>(
 
     },
 
+    documentId: {
+
+        type: String,
+
+        required: true
+
+    },
+
     ownerId: {
 
         type: String,
@@ -47,6 +65,35 @@ const SessionSchema = new Schema<ISession>(
         required: true
 
     },
+
+    requesterEmail: {
+
+        type: String,
+
+        default: ""
+
+    },
+    printCount: {
+        type: Number,
+        default: 0
+    },
+    viewCount: {
+        type: Number,
+        default: 0
+    },
+    deviceFingerprint: {
+        type: String,
+        default: ""
+    },
+    deviceInfo: {
+        type: Schema.Types.Mixed,
+        default: {}
+    },
+    ipAddress: {
+        type: String,
+        default: ""
+    },
+    lastAccessAt: Date,
 
     status: {
 

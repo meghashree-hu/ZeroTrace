@@ -1,8 +1,6 @@
 import QRCode from "qrcode";
 
-export const generateQRCode = async (token: string) => {
-
-    const url = `http://localhost:5173/share/${token}`;
+export const generateQRCode = async (url: string) => {
 
     const qr = await QRCode.toDataURL(url);
 

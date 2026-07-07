@@ -8,6 +8,7 @@ import authRoutes from "./modules/auth/routes/auth.routes";
 import documentRoutes from "./modules/document/routes/document.routes";
 import shareRoutes from "./modules/share/routes/share.routes";
 import sessionRoutes from "./modules/session/routes/session.routes";
+import auditRoutes from "./modules/audit/routes/audit.routes";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/share", shareRoutes);
 app.use("/api/session", sessionRoutes);
+app.use("/api/audit", auditRoutes);
 
 
 export default app;

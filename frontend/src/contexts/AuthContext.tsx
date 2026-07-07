@@ -22,18 +22,29 @@ export const AuthProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return null;
 
-  const [token, setToken] = useState<string | null>(null);
+    try {
+      return JSON.parse(storedUser) as User;
+    } catch {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      return null;
+    }
+  });
+
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    const handleLogout = () => {
+      setUser(null);
+      setToken(null);
+    };
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
+    window.addEventListener("auth:logout", handleLogout);
+    return () => window.removeEventListener("auth:logout", handleLogout);
   }, []);
 
   const login = (user: User, token: string) => {

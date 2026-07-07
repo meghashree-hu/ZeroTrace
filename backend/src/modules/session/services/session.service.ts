@@ -1,34 +1,40 @@
 import { v4 as uuidv4 } from "uuid";
 
 import Session from "../../../models/session.model";
-import Share from "../../../models/share.model";
+import { validateShareToken } from "../../share/services/share.service";
 
 export const requestAccess = async (
-    shareToken: string
+    shareToken: string,
+    deviceFingerprint: string,
+    deviceInfo?: any,
+    ipAddress?: string
 ) => {
+    const data = await validateShareToken(shareToken);
+    const share = data.share;
 
-    // Find the share
-    const share = await Share.findOne({
-        shareToken
-    });
+    const existingSession = await Session.findOne({
+        shareId: share.shareId,
+        deviceFingerprint,
+        status: { $in: ["PENDING", "APPROVED"] },
+    }).sort({ requestedAt: -1 });
 
-    if (!share) {
-        throw new Error("Invalid Share Token");
+    if (existingSession) {
+        existingSession.deviceInfo = deviceInfo || existingSession.deviceInfo || {};
+        existingSession.ipAddress = ipAddress || existingSession.ipAddress || "";
+        await existingSession.save();
+        return existingSession;
     }
 
-    // Create session
-    const session = await Session.create({
-
-        sessionId: `SES-${uuidv4().slice(0,8).toUpperCase()}`,
-
+    return await Session.create({
+        sessionId: `SES-${uuidv4().slice(0, 8).toUpperCase()}`,
         shareId: share.shareId,
-
+        documentId: share.documentId,
         ownerId: share.ownerId,
-
-        status: "PENDING"
-
+        requesterEmail: "",
+        status: "PENDING",
+        deviceFingerprint,
+        deviceInfo: deviceInfo || {},
+        ipAddress: ipAddress || "",
+        expiresAt: share.expiresAt
     });
-
-    return session;
-
 };

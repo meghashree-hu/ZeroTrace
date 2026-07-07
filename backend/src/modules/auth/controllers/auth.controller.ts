@@ -20,25 +20,23 @@ export const register = async (
 
   try {
 
-    const { fullName, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    const user = await registerUser(
-      fullName,
-      email,
-      password
-    );
+    await registerUser(name, email, password);
 
     return res.status(201).json({
       success: true,
-      message: "User Registered Successfully",
-      data: user
+      message: "Registration successful",
     });
 
   } catch (error: any) {
+    if (error.message === "User already exists") {
+      return res.status(409).json({ success: false, message: error.message });
+    }
 
     return res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
 
   }
