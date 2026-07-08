@@ -12,7 +12,15 @@ export interface ISession extends Document {
 
     requesterEmail?: string;
 
-    status: "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED";
+    status:
+    | "CREATED"
+    | "REQUESTED"
+    | "APPROVED"
+    | "PRINTING"
+    | "COMPLETED"
+    | "REJECTED"
+    | "REVOKED"
+    | "EXPIRED";
 
     requestedAt: Date;
 
@@ -100,18 +108,16 @@ const SessionSchema = new Schema<ISession>(
         type: String,
 
         enum: [
-
-            "PENDING",
-
-            "APPROVED",
-
-            "REJECTED",
-
-            "EXPIRED"
-
-        ],
-
-        default: "PENDING"
+    "CREATED",
+    "REQUESTED",
+    "APPROVED",
+    "PRINTING",
+    "COMPLETED",
+    "REJECTED",
+    "REVOKED",
+    "EXPIRED"
+],
+default: "CREATED"
 
     },
 

@@ -17,7 +17,7 @@ const formatFingerprint = (fingerprint?: string) => {
 export const getPendingSessions = async (ownerId: string) => {
   const sessions = await Session.find({
     ownerId,
-    status: "PENDING",
+    status: "REQUESTED",
   }).lean();
 
   const results = await Promise.all(

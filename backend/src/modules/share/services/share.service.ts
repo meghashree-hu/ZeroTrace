@@ -20,6 +20,7 @@ export const createShare = async (
     approvalRequired?: boolean;
     watermarkEnabled?: boolean;
     frontendOrigin?: string;
+    autoRevokeAfterPrint?: boolean;
   }
 ) => {
   const token = generateShareToken();
@@ -105,7 +106,7 @@ export const expireShareAndDocumentIfNeeded = async (share: any) => {
   );
 
   await Session.updateMany(
-    { shareId: share.shareId, status: { $in: ["PENDING", "APPROVED"] } },
+    { shareId: share.shareId, status: { $in: ["REQUESTED", "APPROVED"] } },
     { status: "EXPIRED" }
   );
 
@@ -182,7 +183,7 @@ export const validateShareToken = async (shareToken: string, trackView = false) 
       share.status = "REVOKED";
       await share.save();
       await Session.updateMany(
-        { shareId: share.shareId, status: { $in: ["PENDING", "APPROVED"] } },
+        { shareId: share.shareId, status: { $in: ["REQUESTED", "APPROVED"] } },
         { status: "REJECTED" }
       );
       const error = new Error("View limit reached for this secure share.");
@@ -271,7 +272,7 @@ export const revokeShareForOwner = async (ownerId: string, shareId: string) => {
   await share.save();
   await Document.findOneAndUpdate({ documentId: share.documentId, ownerId }, { status: "REVOKED" });
   await Session.updateMany(
-    { shareId: share.shareId, status: { $in: ["PENDING", "APPROVED"] } },
+    { shareId: share.shareId, status: { $in: ["REQUESTED", "APPROVED"] } },
     { status: "REJECTED" }
   );
 

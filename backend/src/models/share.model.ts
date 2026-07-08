@@ -10,11 +10,13 @@ export interface IShare extends Document {
 
   shareToken: string;
 
-  status: "PENDING" | "ACTIVE" | "APPROVED" | "REJECTED" | "REVOKED" | "EXPIRED";
+  status: "REQUESTED" | "ACTIVE" | "APPROVED" | "REJECTED" | "REVOKED" | "EXPIRED";
 
   expiresAt: Date;
 
-  recipientEmail?: string;
+  printsUsed?: number;
+
+  autoRevokeAfterPrint?: boolean;
 
   accessMode?: "VIEW_PRINT" | "PRINT_ONLY";
 
@@ -76,7 +78,7 @@ const ShareSchema = new Schema<IShare>(
 
     enum: [
 
-      "PENDING",
+      "REQUESTED",
 
       "ACTIVE",
 
@@ -102,12 +104,7 @@ const ShareSchema = new Schema<IShare>(
 
   },
 
-  recipientEmail: {
-    type: String,
-    lowercase: true,
-    trim: true,
-    default: ""
-  },
+  
 
   accessMode: {
     type: String,
@@ -124,6 +121,10 @@ const ShareSchema = new Schema<IShare>(
     type: Number,
     default: 0
   },
+  printsUsed: {
+    type: Number,
+    default: 0
+},
 
   downloadAllowed: {
     type: Boolean,
@@ -138,7 +139,11 @@ const ShareSchema = new Schema<IShare>(
   watermarkEnabled: {
     type: Boolean,
     default: true
-  }
+  },
+  autoRevokeAfterPrint: {
+    type: Boolean,
+    default: true
+},
 
 },
 

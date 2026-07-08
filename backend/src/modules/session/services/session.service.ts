@@ -15,7 +15,7 @@ export const requestAccess = async (
     const existingSession = await Session.findOne({
         shareId: share.shareId,
         deviceFingerprint,
-        status: { $in: ["PENDING", "APPROVED"] },
+        status: { $in: ["REQUESTED", "APPROVED"] },
     }).sort({ requestedAt: -1 });
 
     if (existingSession) {
@@ -31,7 +31,7 @@ export const requestAccess = async (
         documentId: share.documentId,
         ownerId: share.ownerId,
         requesterEmail: "",
-        status: "PENDING",
+        status: "REQUESTED",
         deviceFingerprint,
         deviceInfo: deviceInfo || {},
         ipAddress: ipAddress || "",
