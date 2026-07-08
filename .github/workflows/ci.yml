@@ -121,7 +121,7 @@ jobs:
         run: docker build -t zerotrace-backend ./backend
 
       - name: Scan Backend Image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: zerotrace-backend
           format: table
@@ -134,7 +134,7 @@ jobs:
         run: docker build -t zerotrace-frontend ./frontend
 
       - name: Scan Frontend Image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: zerotrace-frontend
           format: table
