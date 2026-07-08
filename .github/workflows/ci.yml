@@ -103,7 +103,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 
-            trivy:
+  trivy:
 
     name: Trivy Security Scan
 
