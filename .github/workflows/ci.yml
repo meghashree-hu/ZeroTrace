@@ -98,6 +98,47 @@ jobs:
         run: npm install
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+            trivy:
+
+    name: Trivy Security Scan
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - docker
+      - sonarcloud
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Build Backend Image
+        run: docker build -t zerotrace-backend ./backend
+
+      - name: Scan Backend Image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: zerotrace-backend
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+
+      - name: Build Frontend Image
+        run: docker build -t zerotrace-frontend ./frontend
+
+      - name: Scan Frontend Image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: zerotrace-frontend
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
