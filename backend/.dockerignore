@@ -27,9 +27,7 @@ logs
 # Runtime files
 uploads
 
-# Docker
-Dockerfile
-docker-compose.yml
+
 
 # Documentation
 README.md

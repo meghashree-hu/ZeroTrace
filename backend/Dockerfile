@@ -3,42 +3,49 @@
 # -----------------------------
 FROM node:22-alpine AS builder
 
-# Create working directory
+# Working directory
 WORKDIR /app
 
-# Copy dependency files
+# Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install ALL dependencies (including dev dependencies)
+RUN npm ci
 
-# Copy project source
+# Copy source code
 COPY . .
 
-# Compile TypeScript
+# Build TypeScript
 RUN npm run build
-
 
 # -----------------------------
 # Stage 2 - Production Image
 # -----------------------------
 FROM node:22-alpine
 
+# Working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm install --omit=dev
+# Install ONLY production dependencies
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy compiled application
 COPY --from=builder /app/dist ./dist
 
-# Copy uploads folder
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
+# Create uploads directory and assign permissions
+RUN mkdir -p uploads \
+    && chown -R appuser:appgroup /app
 
-# Application Port
+# Switch to non-root user
+USER appuser
+
+# Expose application port
 EXPOSE 5000
 
 # Start application
