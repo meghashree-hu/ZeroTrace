@@ -44,13 +44,14 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
       session.status = "EXPIRED";
       await session.save();
       await createAuditLog({
-        action: "EXPIRED",
-        sessionId: session.sessionId,
-        shareId: session.shareId,
-        documentId: session.documentId,
-       ipAddress: getClientIp(req),
-        userAgent: req.headers["user-agent"] as string | undefined,
-      });
+  action: "EXPIRED",
+  userId: session.ownerId,
+  sessionId: session.sessionId,
+  shareId: session.shareId,
+  documentId: session.documentId,
+  ipAddress: getClientIp(req),
+  userAgent: req.headers["user-agent"] as string | undefined,
+});
 
       return res.status(410).json({
         success: false,
@@ -117,13 +118,14 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
     await Promise.all([session.save(), share.save()]);
 
     await createAuditLog({
-      action: "PRINT_STARTED",
-      documentId: session.documentId,
-      shareId: session.shareId,
-      sessionId: session.sessionId,
-      ipAddress: getClientIp(req),
-      userAgent: req.headers["user-agent"] as string | undefined,
-    });
+  action: "PRINT_STARTED",
+  userId: session.ownerId,
+  documentId: session.documentId,
+  shareId: session.shareId,
+  sessionId: session.sessionId,
+  ipAddress: getClientIp(req),
+  userAgent: req.headers["user-agent"] as string | undefined,
+});
 
     const fileStream = fs.createReadStream(filePath);
 
@@ -133,13 +135,14 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
         await session.save();
 
         await createAuditLog({
-          action: "PRINT_COMPLETED",
-          documentId: session.documentId,
-          shareId: session.shareId,
-          sessionId: session.sessionId,
-          ipAddress: getClientIp(req),
-          userAgent: req.headers["user-agent"] as string | undefined,
-        });
+  action: "PRINT_COMPLETED",
+  userId: session.ownerId,
+  documentId: session.documentId,
+  shareId: session.shareId,
+  sessionId: session.sessionId,
+  ipAddress: getClientIp(req),
+  userAgent: req.headers["user-agent"] as string | undefined,
+});
 
         if (share.autoRevokeAfterPrint !== false || (maxPrints > 0 && (share.printsUsed || 0) >= maxPrints)) {
           share.status = "REVOKED";
@@ -149,13 +152,14 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
             { status: "REVOKED" }
           );
           await createAuditLog({
-            action: "REVOKED",
-            documentId: session.documentId,
-            shareId: session.shareId,
-            sessionId: session.sessionId,
-            ipAddress: getClientIp(req),
-            userAgent: req.headers["user-agent"] as string | undefined,
-          });
+  action: "REVOKED",
+  userId: session.ownerId,
+  documentId: session.documentId,
+  shareId: session.shareId,
+  sessionId: session.sessionId,
+  ipAddress: getClientIp(req),
+  userAgent: req.headers["user-agent"] as string | undefined,
+});
         }
       } catch (e) {
         console.warn("Failed to complete secure print lifecycle", e);

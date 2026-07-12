@@ -1,11 +1,17 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import type { AuthRequest } from "../../../middleware/auth.middleware";
 import AuditLog from "../../../models/activityLog.model";
 import User from "../../../models/user.model";
 import Document from "../../../models/document.model";
 
-export const getAuditLogs = async (req: Request, res: Response) => {
+
+export const getAuditLogs = async (req: AuthRequest, res: Response) => {
   try {
-    const logs = await AuditLog.find().sort({ createdAt: -1 }).limit(200);
+    const logs = await AuditLog.find({
+  userId: req.user?.id,
+})
+  .sort({ createdAt: -1 })
+  .limit(200);
 
     // enrich logs with user email and document name when available
     const enriched = await Promise.all(

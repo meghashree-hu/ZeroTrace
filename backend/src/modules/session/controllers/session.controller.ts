@@ -29,13 +29,14 @@ export const createSession = async (
 
         try {
             await createAuditLog({
-                action: "REQUEST_SENT",
-                documentId: session.documentId,
-                shareId: session.shareId,
-                sessionId: session.sessionId,
-                ipAddress: getClientIp(req),
-                userAgent: req.headers["user-agent"] as string | undefined,
-            });
+    action: "REQUEST_SENT",
+    userId: session.ownerId,
+    documentId: session.documentId,
+    shareId: session.shareId,
+    sessionId: session.sessionId,
+    ipAddress: getClientIp(req),
+    userAgent: req.headers["user-agent"] as string | undefined,
+});
         } catch (e) {
             console.warn("Failed to create audit log for request access", e);
         }

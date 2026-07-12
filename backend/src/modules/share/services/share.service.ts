@@ -113,10 +113,11 @@ export const expireShareAndDocumentIfNeeded = async (share: any) => {
   if (newlyExpired) {
     try {
       await createAuditLog({
-        action: "SHARE_EXPIRED",
-        shareId: share.shareId,
-        documentId: share.documentId,
-      });
+    action: "SHARE_EXPIRED",
+    userId: share.ownerId,
+    shareId: share.shareId,
+    documentId: share.documentId,
+});
     } catch (e) {
       console.warn("Failed to audit share expiry", e);
     }
@@ -142,10 +143,11 @@ export const validateShareToken = async (shareToken: string, trackView = false) 
   if (share.status === "EXPIRED" || share.status === "REVOKED") {
     try {
       await createAuditLog({
-        action: "SESSION_REVOKED",
-        shareId: share.shareId,
-        documentId: share.documentId,
-      });
+    action: "SESSION_REVOKED",
+    userId: share.ownerId,
+    shareId: share.shareId,
+    documentId: share.documentId,
+});
     } catch (e) {
       console.warn("Failed to audit share revoked", e);
     }
@@ -193,10 +195,11 @@ export const validateShareToken = async (shareToken: string, trackView = false) 
     }
 
     await createAuditLog({
-      action: "LINK_OPENED",
-      documentId: share.documentId,
-      shareId: share.shareId,
-    });
+    action: "LINK_OPENED",
+    userId: share.ownerId,
+    documentId: share.documentId,
+    shareId: share.shareId,
+});
   }
 
   return {

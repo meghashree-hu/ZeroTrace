@@ -36,11 +36,12 @@ export const getSessionStatus = async (req: Request, res: Response) => {
 
       try {
         await createAuditLog({
-          action: "EXPIRED",
-          sessionId: session.sessionId,
-          shareId: session.shareId,
-          documentId: session.documentId,
-        });
+  action: "EXPIRED",
+  userId: session.ownerId,
+  sessionId: session.sessionId,
+  shareId: session.shareId,
+  documentId: session.documentId,
+});
       } catch (e) {
         console.warn("Failed to audit session expiry", e);
       }
