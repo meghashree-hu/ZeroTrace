@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { requestAccess } from "../services/session.service";
 import { createAuditLog } from "../../../utils/audit";
+import { getClientIp } from "../../../utils/getClientIp";
 
 export const createSession = async (
     req: Request,
@@ -24,7 +25,7 @@ export const createSession = async (
             });
         }
 
-        const session = await requestAccess(shareToken, deviceFingerprint, deviceInfo, req.ip || "");
+        const session = await requestAccess(shareToken, deviceFingerprint, deviceInfo, getClientIp(req) || "");
 
         try {
             await createAuditLog({
@@ -32,7 +33,7 @@ export const createSession = async (
                 documentId: session.documentId,
                 shareId: session.shareId,
                 sessionId: session.sessionId,
-                ipAddress: req.ip,
+                ipAddress: getClientIp(req),
                 userAgent: req.headers["user-agent"] as string | undefined,
             });
         } catch (e) {

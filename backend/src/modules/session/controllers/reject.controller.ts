@@ -3,6 +3,7 @@ import { AuthRequest } from "../../../middleware/auth.middleware";
 
 import { rejectSession } from "../services/reject.service";
 import { createAuditLog } from "../../../utils/audit";
+import { getClientIp } from "../../../utils/getClientIp";
 
 export const reject = async (
     req: AuthRequest,
@@ -26,7 +27,7 @@ export const reject = async (
                 action: "REJECT_ACCESS",
                 userId: ownerId,
                 sessionId,
-                ipAddress: req.ip,
+                ipAddress: getClientIp(req),
                 userAgent: req.headers["user-agent"] as string | undefined,
             });
         } catch (e) {

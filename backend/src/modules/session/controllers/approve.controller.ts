@@ -3,6 +3,7 @@ import { AuthRequest } from "../../../middleware/auth.middleware";
 
 import { approveSession } from "../services/approve.service";
 import { createAuditLog } from "../../../utils/audit";
+import { getClientIp } from "../../../utils/getClientIp";
 
 export const approve = async (
     req: AuthRequest,
@@ -34,7 +35,7 @@ export const approve = async (
                 documentId: session.documentId,
                 shareId: session.shareId,
                 sessionId,
-                ipAddress: req.ip,
+                ipAddress: getClientIp(req),
                 userAgent: req.headers["user-agent"] as string | undefined,
             });
         } catch (e) {

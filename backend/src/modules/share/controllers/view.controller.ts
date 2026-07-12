@@ -6,6 +6,7 @@ import Session from "../../../models/session.model";
 import Document from "../../../models/document.model";
 import { createAuditLog } from "../../../utils/audit";
 import { validateShareToken } from "../services/share.service";
+import { getClientIp } from "../../../utils/getClientIp";
 
 export const viewSharedDocument = async (req: Request, res: Response) => {
   try {
@@ -47,7 +48,7 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
         sessionId: session.sessionId,
         shareId: session.shareId,
         documentId: session.documentId,
-        ipAddress: req.ip,
+       ipAddress: getClientIp(req),
         userAgent: req.headers["user-agent"] as string | undefined,
       });
 
@@ -111,7 +112,7 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
     session.status = "PRINTING";
     session.printCount = (session.printCount || 0) + 1;
     session.lastAccessAt = new Date();
-    session.ipAddress = req.ip || session.ipAddress || "";
+    session.ipAddress = getClientIp(req) || session.ipAddress || "";
     share.printsUsed = (share.printsUsed || 0) + 1;
     await Promise.all([session.save(), share.save()]);
 
@@ -120,7 +121,7 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
       documentId: session.documentId,
       shareId: session.shareId,
       sessionId: session.sessionId,
-      ipAddress: req.ip,
+      ipAddress: getClientIp(req),
       userAgent: req.headers["user-agent"] as string | undefined,
     });
 
@@ -136,7 +137,7 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
           documentId: session.documentId,
           shareId: session.shareId,
           sessionId: session.sessionId,
-          ipAddress: req.ip,
+          ipAddress: getClientIp(req),
           userAgent: req.headers["user-agent"] as string | undefined,
         });
 
@@ -152,7 +153,7 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
             documentId: session.documentId,
             shareId: session.shareId,
             sessionId: session.sessionId,
-            ipAddress: req.ip,
+            ipAddress: getClientIp(req),
             userAgent: req.headers["user-agent"] as string | undefined,
           });
         }
