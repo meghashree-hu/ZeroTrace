@@ -21,6 +21,15 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("🚀 ZeroTrace Backend Running");
 });
+app.get("/ip-test", (req, res) => {
+  res.json({
+    reqIp: req.ip,
+    forwarded: req.headers["x-forwarded-for"],
+    realIp: req.headers["x-real-ip"],
+    remoteAddress: req.socket.remoteAddress,
+    headers: req.headers,
+  });
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
