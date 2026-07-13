@@ -22,7 +22,7 @@ type ShareDetails = {
     ownerId: string;
     ownerName: string;
     ownerEmail: string;
-    accessMode: string;
+   
     maxViews: number;
     maxPrints: number;
   };
@@ -341,7 +341,7 @@ const ShareDocument = () => {
             </div>
             <div className="rounded-xl border border-white/10 bg-slate-950/50 p-5">
               <p className="text-sm text-slate-500">Access Mode</p>
-              <p className="mt-3 text-sm font-medium text-slate-200">{shareDetails?.share.accessMode}</p>
+              
             </div>
           </div>
 

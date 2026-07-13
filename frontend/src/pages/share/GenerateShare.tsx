@@ -10,19 +10,18 @@ import { Card, CardContent, CardHeader } from "../../components/ui/Card";
 import { Input, Select, Toggle } from "../../components/ui/Input";
 import { PageHeader } from "../../components/ui/PageHeader";
 
-const accessModes = ["VIEW_PRINT", "PRINT_ONLY"];
 
 const GenerateShare: React.FC = () => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [selectedDocument, setSelectedDocument] = useState("");
-  const [accessMode, setAccessMode] = useState(accessModes[0]);
+  
   const [expiryMinutes, setExpiryMinutes] = useState(60);
-  const [maxViews, setMaxViews] = useState(10);
+ 
   const [maxPrints, setMaxPrints] = useState(5);
-  const [downloadAllowed, setDownloadAllowed] = useState(true);
+  
   const [approvalRequired, setApprovalRequired] = useState(false);
   const [watermarkEnabled, setWatermarkEnabled] = useState(true);
-  const [autoRevokeAfterPrint, setAutoRevokeAfterPrint] = useState(true);
+  
   const [link, setLink] = useState("");
   const [shareToken, setShareToken] = useState("");
   const [shareStatus, setShareStatus] = useState("");
@@ -77,14 +76,14 @@ const GenerateShare: React.FC = () => {
     try {
       const response = await generateShareLink({
         documentId: selectedDocument,
-        accessMode,
+        
         expiryMinutes,
-        maxViews,
+        
         maxPrints,
-        downloadAllowed,
+        
         approvalRequired,
         watermarkEnabled,
-        autoRevokeAfterPrint,
+       
         frontendOrigin: getFrontendOrigin(),
       });
 
@@ -134,25 +133,19 @@ const GenerateShare: React.FC = () => {
                 </option>
               ))}
             </Select>
-            <Select label="Access Mode" value={accessMode} onChange={(e) => setAccessMode(e.target.value)}>
-              {accessModes.map((mode) => (
-                <option key={mode} value={mode}>
-                  {mode}
-                </option>
-              ))}
-            </Select>
+           
 
             <div className="grid gap-4 md:grid-cols-3">
               <Input label="Expiry" type="number" value={expiryMinutes} onChange={(e) => setExpiryMinutes(Number(e.target.value))} />
-              <Input label="Max Views" type="number" value={maxViews} onChange={(e) => setMaxViews(Number(e.target.value))} />
+
               <Input label="Max Prints" type="number" value={maxPrints} onChange={(e) => setMaxPrints(Number(e.target.value))} />
             </div>
 
             <div className="grid gap-3 md:grid-cols-4">
-              <Toggle label="Download allowed" checked={downloadAllowed} onChange={setDownloadAllowed} />
+              
               <Toggle label="Approval required" checked={approvalRequired} onChange={setApprovalRequired} />
               <Toggle label="Watermark enabled" checked={watermarkEnabled} onChange={setWatermarkEnabled} />
-              <Toggle label="Auto revoke after print" checked={autoRevokeAfterPrint} onChange={setAutoRevokeAfterPrint} />
+             
             </div>
 
             <Button onClick={handleGenerateShare} disabled={loading} className="w-full">
