@@ -16,15 +16,15 @@ export interface IShare extends Document {
 
   printsUsed?: number;
 
-  autoRevokeAfterPrint?: boolean;
+ 
 
-  accessMode?: "VIEW_PRINT" | "PRINT_ONLY";
+  
 
-  maxViews?: number;
+  
 
   maxPrints?: number;
 
-  downloadAllowed?: boolean;
+  
 
   approvalRequired?: boolean;
 
@@ -106,16 +106,9 @@ const ShareSchema = new Schema<IShare>(
 
   
 
-  accessMode: {
-    type: String,
-    enum: ["VIEW_PRINT", "PRINT_ONLY"],
-    default: "VIEW_PRINT"
-  },
+  
 
-  maxViews: {
-    type: Number,
-    default: 0
-  },
+  
 
   maxPrints: {
     type: Number,
@@ -126,10 +119,7 @@ const ShareSchema = new Schema<IShare>(
     default: 0
 },
 
-  downloadAllowed: {
-    type: Boolean,
-    default: false
-  },
+ 
 
   approvalRequired: {
     type: Boolean,
@@ -140,10 +130,7 @@ const ShareSchema = new Schema<IShare>(
     type: Boolean,
     default: true
   },
-  autoRevokeAfterPrint: {
-    type: Boolean,
-    default: true
-},
+  
 
 },
 

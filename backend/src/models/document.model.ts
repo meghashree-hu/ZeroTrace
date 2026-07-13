@@ -18,6 +18,8 @@ export interface IDocument extends Document {
 
     encryptedAESKey: string;
 
+    authenticationTag: string;
+
     uploadedAt: Date;
 
     status: string;
@@ -113,6 +115,14 @@ const DocumentSchema = new Schema<IDocument>(
         default: ""
 
     },
+    authenticationTag: {
+
+    type: String,
+
+    default: ""
+
+},
+
 
     uploadedAt: {
 

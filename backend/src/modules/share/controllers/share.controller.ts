@@ -15,14 +15,14 @@ export const generateShare = async (
   try {
     const {
       documentId,
-      accessMode,
+      
       expiryMinutes,
-      maxViews,
+      
       maxPrints,
-      downloadAllowed,
+      
       approvalRequired,
       watermarkEnabled,
-      autoRevokeAfterPrint,
+     
       frontendOrigin,
     } = req.body;
     const ownerId = req.user!.id;
@@ -35,14 +35,14 @@ export const generateShare = async (
     }
 
     const result = await createShare(documentId, ownerId, {
-      accessMode,
+     
       expiryMinutes,
-      maxViews,
+     
       maxPrints,
-      downloadAllowed,
+      
       approvalRequired,
       watermarkEnabled,
-      autoRevokeAfterPrint,
+     
       frontendOrigin,
     });
 

@@ -28,7 +28,7 @@ export interface ISession extends Document {
 
     expiresAt?: Date;
     printCount?: number;
-    viewCount?: number;
+    
     deviceFingerprint?: string;
     deviceInfo?: any;
     ipAddress?: string;
@@ -85,10 +85,7 @@ const SessionSchema = new Schema<ISession>(
         type: Number,
         default: 0
     },
-    viewCount: {
-        type: Number,
-        default: 0
-    },
+    
     deviceFingerprint: {
         type: String,
         default: ""

@@ -12,15 +12,15 @@ export const createShare = async (
   documentId: string,
   ownerId: string,
   options: {
-    accessMode?: "VIEW_PRINT" | "PRINT_ONLY";
+    
     expiryMinutes?: number;
-    maxViews?: number;
+    
     maxPrints?: number;
-    downloadAllowed?: boolean;
+    
     approvalRequired?: boolean;
     watermarkEnabled?: boolean;
     frontendOrigin?: string;
-    autoRevokeAfterPrint?: boolean;
+    
   }
 ) => {
   const token = generateShareToken();
@@ -56,10 +56,10 @@ export const createShare = async (
     shareToken: token,
     status: "ACTIVE",
     expiresAt: expiry,
-    accessMode: options.accessMode || "VIEW_PRINT",
-    maxViews: Number(options.maxViews || 0),
+    
+   
     maxPrints: Number(options.maxPrints || 0),
-    downloadAllowed: Boolean(options.downloadAllowed),
+    
     approvalRequired: options.approvalRequired !== undefined ? Boolean(options.approvalRequired) : true,
     watermarkEnabled: options.watermarkEnabled !== undefined ? Boolean(options.watermarkEnabled) : true
   });
@@ -174,33 +174,14 @@ export const validateShareToken = async (shareToken: string, trackView = false) 
 
   const owner = await User.findOne({ userId: share.ownerId }).lean();
 
-  if (trackView) {
-    if ((share.maxViews || 0) > 0) {
-      const viewTotals = await Session.aggregate([
-        { $match: { shareId: share.shareId } },
-        { $group: { _id: null, total: { $sum: "$viewCount" } } },
-      ]);
-      const currentViews = viewTotals[0]?.total || 0;
-      if (currentViews >= (share.maxViews || 0)) {
-      share.status = "REVOKED";
-      await share.save();
-      await Session.updateMany(
-        { shareId: share.shareId, status: { $in: ["REQUESTED", "APPROVED"] } },
-        { status: "REJECTED" }
-      );
-      const error = new Error("View limit reached for this secure share.");
-      (error as any).statusCode = 403;
-      throw error;
-      }
-    }
-
-    await createAuditLog({
+ if (trackView) {
+  await createAuditLog({
     action: "LINK_OPENED",
     userId: share.ownerId,
     documentId: share.documentId,
     shareId: share.shareId,
-});
-  }
+  });
+}
 
   return {
     share: {
@@ -212,15 +193,15 @@ export const validateShareToken = async (shareToken: string, trackView = false) 
       ownerId: share.ownerId,
       ownerName: owner?.fullName || "",
       ownerEmail: owner?.email || "",
-      accessMode: share.accessMode || "VIEW_PRINT",
-      maxViews: share.maxViews || 0,
+      
+      
       maxPrints: share.maxPrints || 0,
-      viewsUsed: 0,
+      
       printsUsed: 0,
-      downloadAllowed: Boolean(share.downloadAllowed),
+      
       approvalRequired: share.approvalRequired !== false,
       watermarkEnabled: share.watermarkEnabled !== false,
-      autoRevokeAfterPrint: false
+      
     },
     document: {
       documentId: document.documentId,
@@ -255,7 +236,7 @@ export const getShareHistoryForOwner = async (ownerId: string) => {
         documentId: share.documentId,
         documentName: document?.originalFileName || "Unknown Document",
         status: share.status,
-        viewsUsed: sessions.reduce((sum: number, session: any) => sum + (session.viewCount || 0), 0),
+        
         printsUsed: sessions.reduce((sum: number, session: any) => sum + (session.printCount || 0), 0),
         createdTime: share.createdAt,
         expiryTime: share.expiresAt,

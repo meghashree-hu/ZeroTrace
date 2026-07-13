@@ -7,6 +7,7 @@ import Document from "../../../models/document.model";
 import { createAuditLog } from "../../../utils/audit";
 import { validateShareToken } from "../services/share.service";
 import { getClientIp } from "../../../utils/getClientIp";
+import { watermarkPdf, watermarkImage } from "../../../utils/watermark";
 
 export const viewSharedDocument = async (req: Request, res: Response) => {
   try {
@@ -27,11 +28,13 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
     const shareId = shareData.share.shareId;
 
     const session = await Session.findOne({
-      sessionId: incomingSessionId,
-      shareId,
-      deviceFingerprint: incomingFingerprint,
-      status: "APPROVED",
-    }).sort({ approvedAt: -1 });
+  sessionId: incomingSessionId,
+  shareId,
+  deviceFingerprint: incomingFingerprint,
+  status: {
+    $in: ["APPROVED", "PRINTING", "COMPLETED"],
+  },
+}).sort({ approvedAt: -1 });
 
     if (!session) {
       return res.status(403).json({
@@ -66,19 +69,28 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
         message: "This secure share is no longer active.",
       });
     }
-
+const activeShare = share!;
     const maxPrints = share.maxPrints || 0;
-    if (maxPrints > 0 && (share.printsUsed || 0) >= maxPrints) {
-      share.status = "REVOKED";
-      await share.save();
-      session.status = "REVOKED";
-      await session.save();
-      return res.status(403).json({
-        success: false,
-        message: "Print limit exceeded for this shared document.",
-      });
-    }
 
+// Block any print after the configured limit
+if (maxPrints > 0) {
+  const printsUsed = share.printsUsed || 0;
+
+  if (printsUsed >= maxPrints) {
+    activeShare.status = "REVOKED";
+    session.status = "REVOKED";
+
+    await Promise.all([
+      activeShare.save(),
+      session.save(),
+    ]);
+
+    return res.status(403).json({
+      success: false,
+      message: `Maximum print limit (${maxPrints}) has been reached.`,
+    });
+  }
+}
     const document = await Document.findOne({
       documentId: session.documentId,
       ownerId: session.ownerId,
@@ -109,13 +121,19 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
         message: "Document deleted or no longer available.",
       });
     }
+// Count document view
+
+
 
     session.status = "PRINTING";
     session.printCount = (session.printCount || 0) + 1;
     session.lastAccessAt = new Date();
     session.ipAddress = getClientIp(req) || session.ipAddress || "";
-    share.printsUsed = (share.printsUsed || 0) + 1;
-    await Promise.all([session.save(), share.save()]);
+    activeShare.printsUsed = (activeShare.printsUsed || 0) + 1;
+    await Promise.all([
+  session.save(),
+  activeShare.save(),
+]);
 
     await createAuditLog({
   action: "PRINT_STARTED",
@@ -144,11 +162,14 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
   userAgent: req.headers["user-agent"] as string | undefined,
 });
 
-        if (share.autoRevokeAfterPrint !== false || (maxPrints > 0 && (share.printsUsed || 0) >= maxPrints)) {
-          share.status = "REVOKED";
-          await share.save();
+        if (
+  maxPrints > 0 &&
+  (activeShare.printsUsed || 0) >= maxPrints
+){
+          activeShare.status = "REVOKED";
+          await activeShare.save();
           await Session.updateMany(
-            { shareId: share.shareId, status: { $in: ["CREATED", "REQUESTED", "APPROVED", "PRINTING"] } },
+            { shareId: activeShare.shareId, status: { $in: ["CREATED", "REQUESTED", "APPROVED", "PRINTING"] } },
             { status: "REVOKED" }
           );
           await createAuditLog({
