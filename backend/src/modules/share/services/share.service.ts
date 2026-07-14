@@ -133,6 +133,7 @@ export const validateShareToken = async (shareToken: string, trackView = false) 
     (error as any).statusCode = 404;
     throw error;
   }
+ 
 
   if (await expireShareAndDocumentIfNeeded(share)) {
     const error = new Error("This share link has expired.");

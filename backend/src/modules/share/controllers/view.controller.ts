@@ -71,7 +71,11 @@ export const viewSharedDocument = async (req: Request, res: Response) => {
     }
 const activeShare = share!;
     const maxPrints = share.maxPrints || 0;
-
+console.log("========== PRINT DEBUG ==========");
+console.log("maxPrints:", maxPrints);
+console.log("printsUsed:", activeShare.printsUsed);
+console.log("shareStatus:", activeShare.status);
+console.log("================================");
 // Block any print after the configured limit
 if (maxPrints > 0) {
   const printsUsed = share.printsUsed || 0;
