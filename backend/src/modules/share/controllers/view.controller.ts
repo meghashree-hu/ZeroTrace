@@ -8,6 +8,7 @@ import { createAuditLog } from "../../../utils/audit";
 import { validateShareToken } from "../services/share.service";
 import { getClientIp } from "../../../utils/getClientIp";
 import { watermarkPdf, watermarkImage } from "../../../utils/watermark";
+import { createSecurePrintCopy } from "../../../utils/securePrint";
 
 export const viewSharedDocument = async (req: Request, res: Response) => {
   try {
@@ -118,6 +119,20 @@ if (maxPrints > 0) {
 
     const uploadsDir = path.join(__dirname, "../../../../uploads");
     const filePath = path.join(uploadsDir, path.basename(document.s3Key));
+    const watermarkData = {
+  owner: shareData.share.ownerEmail,
+  shareId: share.shareId,
+  sessionId: session.sessionId,
+  ip: getClientIp(req) || "",
+  timestamp: new Date().toLocaleString(),
+};
+
+const secureFilePath = await createSecurePrintCopy(
+  filePath,
+  document.mimeType,
+  watermarkData,
+  session.sessionId
+);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({
@@ -148,11 +163,15 @@ if (maxPrints > 0) {
   ipAddress: getClientIp(req),
   userAgent: req.headers["user-agent"] as string | undefined,
 });
+const fileBuffer = fs.readFileSync(filePath);
 
-    const fileStream = fs.createReadStream(filePath);
+    const fileStream = fs.createReadStream(secureFilePath);
 
     fileStream.on("close", async () => {
       try {
+        if (fs.existsSync(secureFilePath)) {
+  fs.unlinkSync(secureFilePath);
+}
         session.status = "COMPLETED";
         await session.save();
 

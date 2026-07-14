@@ -183,7 +183,10 @@ const ShareDocument = () => {
             <div class="watermark">
               <div>${escapeHtml(watermarkText)}</div>
             </div>
-            <iframe src="${fileUrl}" style="width:100%;height:100vh;border:none;" sandbox></iframe>
+           <iframe
+    src="${fileUrl}"
+    style="width:100%;height:100vh;border:none;"
+></iframe>
           </body>
         </html>
       `;

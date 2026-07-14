@@ -24,7 +24,11 @@ export async function watermarkPdf(
   pdfBuffer: Buffer,
   data: WatermarkOptions
 ): Promise<Buffer> {
-  const pdf = await PDFDocument.load(pdfBuffer);
+ const pdf = await PDFDocument.load(pdfBuffer, {
+  ignoreEncryption: true,
+  updateMetadata: false,
+});
+  console.log("Pages:", pdf.getPageCount());
 
   const font = await pdf.embedFont(StandardFonts.HelveticaBold);
 
@@ -45,34 +49,82 @@ export async function watermarkPdf(
     });
   }
 
-  return Buffer.from(await pdf.save());
+  const bytes = await pdf.save({
+  useObjectStreams: false,
+});
+
+return Buffer.from(bytes);
 }
 
 export async function watermarkImage(
   imageBuffer: Buffer,
   data: WatermarkOptions
 ): Promise<Buffer> {
+
+  const metadata = await sharp(imageBuffer).metadata();
+
+  const width = metadata.width || 1200;
+  const height = metadata.height || 1200;
+
   const svg = `
-  <svg width="1200" height="1200">
+  <svg width="${width}" height="${height}">
     <style>
-      .title {
-        fill: rgba(150,150,150,0.25);
-        font-size:40px;
-        font-family:Arial;
-        font-weight:bold;
+      .wm {
+        fill: rgba(255,0,0,0.12);
+        font-size: ${Math.max(width, height) / 18}px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+      }
+
+      .sub {
+        fill: rgba(255,255,255,0.22);
+        font-size: ${Math.max(width, height) / 40}px;
+        font-family: Arial;
       }
     </style>
 
-    <g transform="rotate(-35 600 600)">
-      <text x="180" y="420" class="title">
-ZERO TRACE SECURE PRINT
-Owner: ${data.owner}
-Share: ${data.shareId}
-Session: ${data.sessionId}
-IP: ${data.ip}
-${data.timestamp}
+    <g transform="rotate(-35 ${width / 2} ${height / 2})">
+
+      <text
+        x="${width / 8}"
+        y="${height / 2}"
+        class="wm">
+
+        CONFIDENTIAL
+
       </text>
+
+      <text
+        x="${width / 8}"
+        y="${height / 2 + 60}"
+        class="sub">
+
+        Shared with:
+        ${data.owner}
+
+      </text>
+
+      <text
+        x="${width / 8}"
+        y="${height / 2 + 110}"
+        class="sub">
+
+        Printed:
+        ${data.timestamp}
+
+      </text>
+
+      <text
+        x="${width / 8}"
+        y="${height / 2 + 160}"
+        class="sub">
+
+        Protected by ZeroTrace
+
+      </text>
+
     </g>
+
   </svg>`;
 
   return await sharp(imageBuffer)
